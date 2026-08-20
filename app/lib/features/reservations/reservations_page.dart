@@ -6,6 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../core/api/roost_api.dart';
 import '../../core/config/app_config.dart';
 import '../../core/demo/hostel_data.dart';
+import '../../core/session/session_controller.dart';
 import '../../core/theme/brightness_provider.dart';
 import '../../core/theme/squircle_button.dart';
 import '../../core/theme/surface_card.dart';
@@ -252,6 +253,18 @@ class ReservationsPage extends ConsumerWidget {
               children: [
                 Center(child: StatusPill(current.status)),
                 const SizedBox(height: RoostSpacing.lg),
+                ReceiptDetailRow(
+                  label: 'Name',
+                  value: ref.read(sessionProvider)?.displayName ?? '—',
+                ),
+                ReceiptDetailRow(
+                  label: 'Department',
+                  value: ref.read(sessionProvider)?.displayDept ?? '—',
+                ),
+                ReceiptDetailRow(
+                  label: 'Level',
+                  value: ref.read(sessionProvider)?.displayLevel ?? '—',
+                ),
                 ReceiptDetailRow(
                   label: 'Room',
                   value: 'Room ${current.roomIndex}',

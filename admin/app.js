@@ -6,7 +6,7 @@
 /* ---------------- SEED DATA ---------------- */
 
 const HOSTELS = [
-  { name: 'Hostel A', gender: 'Male', funder: 'School', price: 42000, rooms: [
+  { name: 'Hostel A', gender: 'Male', funder: 'School', price: 100, rooms: [
     { type: '8-bed', avail: 9, total: 48 },
     { type: '10-bed', avail: 3, total: 40 },
   ]},

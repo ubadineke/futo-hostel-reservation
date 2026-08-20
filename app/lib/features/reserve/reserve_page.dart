@@ -8,6 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../../core/api/roost_api.dart';
 import '../../core/config/app_config.dart';
 import '../../core/demo/hostel_data.dart';
+import '../../core/session/session_controller.dart';
 import '../../core/theme/brightness_provider.dart';
 import '../../core/theme/squircle_button.dart';
 import '../../core/theme/surface_card.dart';
@@ -191,6 +192,7 @@ class _ReservePageState extends ConsumerState<ReservePage> {
   }
 
   Future<void> _showReceipt(Hostel h, Reservation res) async {
+    final student = ref.read(sessionProvider);
     await showRoostWavySheet(
       context: context,
       dismissible: false,
@@ -225,6 +227,9 @@ class _ReservePageState extends ConsumerState<ReservePage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            ReceiptDetailRow(label: 'Name', value: student?.displayName ?? '—'),
+            ReceiptDetailRow(label: 'Department', value: student?.displayDept ?? '—'),
+            ReceiptDetailRow(label: 'Level', value: student?.displayLevel ?? '—'),
             ReceiptDetailRow(label: 'Hostel', value: h.name),
             ReceiptDetailRow(label: 'Room', value: 'Room ${res.roomIndex}'),
             ReceiptDetailRow(label: 'Bed', value: 'Bed ${res.bed}'),

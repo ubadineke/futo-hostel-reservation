@@ -12,7 +12,7 @@ const CONFIG = {
 
 // The eight FUTO hostels (mirrors the app's data).
 const HOSTELS = [
-  { name:'Hostel A', funder:'School', gender:'Male', room:'8–10 / room', price:42000, beds:12, total:88, a:'#1E3A8A', b:'#2563EB', lat:5.3869, lng:7.0341 },
+  { name:'Hostel A', funder:'School', gender:'Male', room:'8–10 / room', price:100, beds:12, total:88, a:'#1E3A8A', b:'#2563EB', lat:5.3869, lng:7.0341 },
   { name:'Hostel B', funder:'School', gender:'Male', room:'8–10 / room', price:42000, beds:5, total:98, a:'#312E81', b:'#4F46E5', lat:5.3872, lng:7.0347 },
   { name:'Hostel C', funder:'School', gender:'Female', room:'6–8 / room', price:45000, beds:13, total:84, a:'#0F766E', b:'#0EA5A4', lat:5.3858, lng:7.0359 },
   { name:'Hostel D', funder:'School', gender:'Female', room:'6–8 / room', price:45000, beds:2, total:68, a:'#155E75', b:'#0891B2', lat:5.3855, lng:7.0364 },

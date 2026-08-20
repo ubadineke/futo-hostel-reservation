@@ -11,9 +11,10 @@ Base URL: `/api/v1`  ·  **Live:** `https://futo-hostel-reservation-backend.onre
 ## Auth
 | Method | Path | Purpose | Auth |
 |---|---|---|---|
-| `POST` | `/auth/register` | Create a student. Body: `{ identifier, password }` where `identifier` is reg-no (`20211234567`) **or** school email. Returns `{ token, student }`. | — |
+| `POST` | `/auth/register` | Create a student. Body: `{ name, regNo, email, dept, level, password }`; every field is required and the FUTO email's reg-no must match `regNo`. Returns `{ token, student }`. | — |
 | `POST` | `/auth/login` | Body: `{ identifier, password }` → `{ token, student }`. | — |
 | `GET`  | `/auth/me` | Current student profile. Used to restore session after biometric unlock. | student |
+| `PATCH` | `/auth/me` | Update the current student's `name`, `email`, `dept`, or `level`. | student |
 | `POST` | `/auth/logout` | Invalidate token (optional). | student |
 
 > Biometric (Face ID/fingerprint) is **device-side only** — it unlocks the locally

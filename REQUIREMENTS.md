@@ -49,7 +49,7 @@ and the few published fees conflict (see §9).
 
 | Hostel | Gender | Room size | ~Fee / session |
 |---|---|---|---|
-| A | Male | 8–10 / room | ₦42,000 |
+| A | Male | 8–10 / room | ₦100 |
 | B | Male | 8–10 / room | ₦42,000 |
 | C | Female | 6–8 / room | ₦45,000 |
 | D | Female | 6–8 / room | ₦45,000 |

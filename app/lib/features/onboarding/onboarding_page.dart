@@ -11,7 +11,7 @@ import '../../core/theme/surface_card.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/roost_input.dart';
 
-/// Login. Sign in with reg-number or school email + password (FR1), with a
+/// Login. Sign in with registration number or email + password (FR1), with a
 /// Face ID / fingerprint option (FR3) and a create-account sheet (FR2).
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
@@ -21,9 +21,13 @@ class OnboardingPage extends ConsumerStatefulWidget {
 }
 
 final _regNoRe = RegExp(r'^\d{11}$');
-final _emailRe = RegExp(r'^[a-z]+\.[a-z]+\.\d{11}@futo\.edu\.ng$', caseSensitive: false);
-bool validIdentifier(String s) => _regNoRe.hasMatch(s.trim()) || _emailRe.hasMatch(s.trim());
-bool validPassword(String s) => s.length >= 8 && RegExp(r'[A-Za-z]').hasMatch(s) && RegExp(r'\d').hasMatch(s);
+final _emailRe = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', caseSensitive: false);
+bool validIdentifier(String s) =>
+    _regNoRe.hasMatch(s.trim()) || _emailRe.hasMatch(s.trim());
+bool validPassword(String s) =>
+    s.length >= 8 &&
+    RegExp(r'[A-Za-z]').hasMatch(s) &&
+    RegExp(r'\d').hasMatch(s);
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final _id = TextEditingController();
@@ -42,11 +46,16 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   Future<void> _signIn() async {
     final id = _id.text.trim();
     if (!validIdentifier(id)) {
-      setState(() => _error = 'Enter your reg number (e.g. 20211234567) or school email.');
+      setState(
+        () => _error = 'Enter your registration number or email address.',
+      );
       return;
     }
     if (!validPassword(_pw.text)) {
-      setState(() => _error = 'Password must be at least 8 characters with a letter and a number.');
+      setState(
+        () => _error =
+            'Password must be at least 8 characters with a letter and a number.',
+      );
       return;
     }
     await _authenticate(id, _pw.text, register: false);
@@ -54,7 +63,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   /// Sign in (or register) via the session controller, then bootstrap + navigate.
   /// In demo mode this returns instantly; live mode may pause on a cold backend.
-  Future<void> _authenticate(String identifier, String password, {required bool register}) async {
+  Future<void> _authenticate(
+    String identifier,
+    String password, {
+    required bool register,
+  }) async {
     setState(() {
       _error = null;
       _busy = true;
@@ -87,14 +100,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         _error = null;
         _busy = true;
       });
-      final restored = await ref.read(sessionProvider.notifier).restoreSession();
+      final restored = await ref
+          .read(sessionProvider.notifier)
+          .restoreSession();
       if (!mounted) return;
       setState(() => _busy = false);
       if (restored) {
         context.go('/home');
       } else {
-        setState(() => _error =
-            'Sign in with your password once — then Face ID / fingerprint unlocks next time.');
+        setState(
+          () => _error =
+              'Sign in with your password once — then Face ID / fingerprint unlocks next time.',
+        );
       }
     } catch (_) {
       if (mounted) setState(() => _busy = false);
@@ -108,20 +125,42 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       backgroundColor: RoostColors.surface0,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(RoostSpacing.xxl, 0, RoostSpacing.xxl, RoostSpacing.xxl),
+          padding: const EdgeInsets.fromLTRB(
+            RoostSpacing.xxl,
+            0,
+            RoostSpacing.xxl,
+            RoostSpacing.xxl,
+          ),
           child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.vertical - 48),
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.vertical -
+                  48,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 56),
                 _Wordmark(),
                 const SizedBox(height: RoostSpacing.sm),
-                Text('FUTO Hostel Reservation',
-                    style: TextStyle(fontSize: 16, color: RoostColors.textSecondary, fontWeight: FontWeight.w500)),
+                Text(
+                  'FUTO Hostel Reservation',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: RoostColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('Find a bed, pay, and get your allocation — from your phone.',
-                    style: TextStyle(fontSize: 14, color: RoostColors.textTertiary, height: 1.4)),
+                Text(
+                  'Find a bed, pay, and get your allocation — from your phone.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: RoostColors.textTertiary,
+                    height: 1.4,
+                  ),
+                ),
                 const SizedBox(height: RoostSpacing.xxxl),
                 RoostSurfaceCard(
                   floating: true,
@@ -129,7 +168,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label('Reg number or school email'),
+                      _label('Registration number or email'),
                       RoostTextField(
                         controller: _id,
                         hint: '20211234567',
@@ -148,8 +187,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         onSubmitted: (_) => _signIn(),
                         suffix: GestureDetector(
                           onTap: () => setState(() => _obscure = !_obscure),
-                          child: Icon(_obscure ? PhosphorIcons.eye() : PhosphorIcons.eyeSlash(),
-                              size: 20, color: RoostColors.textTertiary),
+                          child: Icon(
+                            _obscure
+                                ? PhosphorIcons.eye()
+                                : PhosphorIcons.eyeSlash(),
+                            size: 20,
+                            color: RoostColors.textTertiary,
+                          ),
                         ),
                       ),
                       if (_error != null) ...[
@@ -157,9 +201,22 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(PhosphorIcons.warningCircle(), size: 16, color: RoostColors.negative),
+                            Icon(
+                              PhosphorIcons.warningCircle(),
+                              size: 16,
+                              color: RoostColors.negative,
+                            ),
                             const SizedBox(width: 6),
-                            Expanded(child: Text(_error!, style: TextStyle(fontSize: 12.5, color: RoostColors.negative, height: 1.3))),
+                            Expanded(
+                              child: Text(
+                                _error!,
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  color: RoostColors.negative,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -186,11 +243,20 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     behavior: HitTestBehavior.opaque,
                     child: RichText(
                       text: TextSpan(
-                        style: TextStyle(fontSize: 14, color: RoostColors.textSecondary, fontFamily: 'Montserrat'),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: RoostColors.textSecondary,
+                          fontFamily: 'Montserrat',
+                        ),
                         children: [
                           const TextSpan(text: 'New here?  '),
-                          TextSpan(text: 'Create account',
-                              style: TextStyle(color: RoostColors.accent, fontWeight: FontWeight.w700)),
+                          TextSpan(
+                            text: 'Create account',
+                            style: TextStyle(
+                              color: RoostColors.accent,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -201,12 +267,22 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(PhosphorIcons.shieldCheck(), size: 16, color: RoostColors.textTertiary),
+                      Icon(
+                        PhosphorIcons.shieldCheck(),
+                        size: 16,
+                        color: RoostColors.textTertiary,
+                      ),
                       const SizedBox(width: 6),
                       Flexible(
-                        child: Text('Secured for FUTO students',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 12, color: RoostColors.textTertiary, fontWeight: FontWeight.w500)),
+                        child: Text(
+                          'Secured for FUTO students',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: RoostColors.textTertiary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -220,10 +296,16 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Widget _label(String t) => Padding(
-        padding: const EdgeInsets.only(bottom: RoostSpacing.sm, left: 2),
-        child: Text(t, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: RoostColors.textSecondary)),
-      );
-
+    padding: const EdgeInsets.only(bottom: RoostSpacing.sm, left: 2),
+    child: Text(
+      t,
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: RoostColors.textSecondary,
+      ),
+    ),
+  );
 }
 
 /// Full-screen create-account page. Mirrors the sign-in screen (so it can't be
@@ -237,7 +319,11 @@ class SignUpPage extends ConsumerStatefulWidget {
 }
 
 class _SignUpPageState extends ConsumerState<SignUpPage> {
-  final _id = TextEditingController();
+  final _name = TextEditingController();
+  final _regNo = TextEditingController();
+  final _email = TextEditingController();
+  final _dept = TextEditingController();
+  final _level = TextEditingController();
   final _pw = TextEditingController();
   final _confirm = TextEditingController();
   bool _pwObscure = true;
@@ -247,20 +333,42 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
   @override
   void dispose() {
-    _id.dispose();
+    _name.dispose();
+    _regNo.dispose();
+    _email.dispose();
+    _dept.dispose();
+    _level.dispose();
     _pw.dispose();
     _confirm.dispose();
     super.dispose();
   }
 
   Future<void> _create() async {
-    final id = _id.text.trim();
-    if (!validIdentifier(id)) {
-      setState(() => _error = 'Enter your reg number (e.g. 20211234567) or school email.');
+    final name = _name.text.trim();
+    final regNo = _regNo.text.trim();
+    final email = _email.text.trim();
+    final dept = _dept.text.trim();
+    final level = _level.text.trim();
+    if ([name, regNo, email, dept, level].any((field) => field.isEmpty)) {
+      setState(
+        () => _error =
+            'Complete every profile field before creating your account.',
+      );
+      return;
+    }
+    if (!_regNoRe.hasMatch(regNo)) {
+      setState(() => _error = 'Enter an 11-digit registration number.');
+      return;
+    }
+    if (!_emailRe.hasMatch(email)) {
+      setState(() => _error = 'Enter a valid email address.');
       return;
     }
     if (!validPassword(_pw.text)) {
-      setState(() => _error = 'Password must be at least 8 characters with a letter and a number.');
+      setState(
+        () => _error =
+            'Password must be at least 8 characters with a letter and a number.',
+      );
       return;
     }
     if (_pw.text != _confirm.text) {
@@ -273,7 +381,16 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     });
     final err = await ref
         .read(sessionProvider.notifier)
-        .signIn(identifier: id, password: _pw.text, register: true);
+        .signIn(
+          identifier: regNo,
+          password: _pw.text,
+          register: true,
+          name: name,
+          regNo: regNo,
+          email: email,
+          dept: dept,
+          level: level,
+        );
     if (!mounted) return;
     setState(() => _busy = false);
     if (err == null) {
@@ -286,11 +403,14 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   void _backToSignIn() => context.canPop() ? context.pop() : context.go('/');
 
   Widget _eyeSuffix(bool obscure, VoidCallback onTap) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Icon(obscure ? PhosphorIcons.eye() : PhosphorIcons.eyeSlash(),
-            size: 20, color: RoostColors.textTertiary),
-      );
+    onTap: onTap,
+    behavior: HitTestBehavior.opaque,
+    child: Icon(
+      obscure ? PhosphorIcons.eye() : PhosphorIcons.eyeSlash(),
+      size: 20,
+      color: RoostColors.textTertiary,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -299,20 +419,42 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
       backgroundColor: RoostColors.surface0,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(RoostSpacing.xxl, 0, RoostSpacing.xxl, RoostSpacing.xxl),
+          padding: const EdgeInsets.fromLTRB(
+            RoostSpacing.xxl,
+            0,
+            RoostSpacing.xxl,
+            RoostSpacing.xxl,
+          ),
           child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.vertical - 48),
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.vertical -
+                  48,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 56),
                 _Wordmark(),
                 const SizedBox(height: RoostSpacing.sm),
-                Text('FUTO Hostel Reservation',
-                    style: TextStyle(fontSize: 16, color: RoostColors.textSecondary, fontWeight: FontWeight.w500)),
+                Text(
+                  'FUTO Hostel Reservation',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: RoostColors.textSecondary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('Create your account to reserve a bed.',
-                    style: TextStyle(fontSize: 14, color: RoostColors.textTertiary, height: 1.4)),
+                Text(
+                  'Create your account to reserve a bed.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: RoostColors.textTertiary,
+                    height: 1.4,
+                  ),
+                ),
                 const SizedBox(height: RoostSpacing.xxxl),
                 RoostSurfaceCard(
                   floating: true,
@@ -320,12 +462,45 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _label('Reg number or school email'),
+                      _label('Full name'),
                       RoostTextField(
-                        controller: _id,
+                        controller: _name,
+                        hint: 'Your full name',
+                        icon: PhosphorIcons.user(),
+                        action: TextInputAction.next,
+                      ),
+                      const SizedBox(height: RoostSpacing.lg),
+                      _label('Registration number'),
+                      RoostTextField(
+                        controller: _regNo,
                         hint: '20211234567',
                         icon: PhosphorIcons.identificationCard(),
+                        keyboardType: TextInputType.number,
+                        action: TextInputAction.next,
+                      ),
+                      const SizedBox(height: RoostSpacing.lg),
+                      _label('Email address'),
+                      RoostTextField(
+                        controller: _email,
+                        hint: 'you@example.com',
+                        icon: PhosphorIcons.envelope(),
                         keyboardType: TextInputType.emailAddress,
+                        action: TextInputAction.next,
+                      ),
+                      const SizedBox(height: RoostSpacing.lg),
+                      _label('Department'),
+                      RoostTextField(
+                        controller: _dept,
+                        hint: 'Software Engineering',
+                        icon: PhosphorIcons.buildings(),
+                        action: TextInputAction.next,
+                      ),
+                      const SizedBox(height: RoostSpacing.lg),
+                      _label('Level'),
+                      RoostTextField(
+                        controller: _level,
+                        hint: '400 Level',
+                        icon: PhosphorIcons.graduationCap(),
                         action: TextInputAction.next,
                       ),
                       const SizedBox(height: RoostSpacing.lg),
@@ -336,7 +511,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         icon: PhosphorIcons.lockSimple(),
                         obscure: _pwObscure,
                         action: TextInputAction.next,
-                        suffix: _eyeSuffix(_pwObscure, () => setState(() => _pwObscure = !_pwObscure)),
+                        suffix: _eyeSuffix(
+                          _pwObscure,
+                          () => setState(() => _pwObscure = !_pwObscure),
+                        ),
                       ),
                       const SizedBox(height: RoostSpacing.lg),
                       _label('Confirm password'),
@@ -347,16 +525,34 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         obscure: _confirmObscure,
                         action: TextInputAction.done,
                         onSubmitted: (_) => _create(),
-                        suffix: _eyeSuffix(_confirmObscure, () => setState(() => _confirmObscure = !_confirmObscure)),
+                        suffix: _eyeSuffix(
+                          _confirmObscure,
+                          () => setState(
+                            () => _confirmObscure = !_confirmObscure,
+                          ),
+                        ),
                       ),
                       if (_error != null) ...[
                         const SizedBox(height: RoostSpacing.md),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(PhosphorIcons.warningCircle(), size: 16, color: RoostColors.negative),
+                            Icon(
+                              PhosphorIcons.warningCircle(),
+                              size: 16,
+                              color: RoostColors.negative,
+                            ),
                             const SizedBox(width: 6),
-                            Expanded(child: Text(_error!, style: TextStyle(fontSize: 12.5, color: RoostColors.negative, height: 1.3))),
+                            Expanded(
+                              child: Text(
+                                _error!,
+                                style: TextStyle(
+                                  fontSize: 12.5,
+                                  color: RoostColors.negative,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -376,11 +572,20 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                     behavior: HitTestBehavior.opaque,
                     child: RichText(
                       text: TextSpan(
-                        style: TextStyle(fontSize: 14, color: RoostColors.textSecondary, fontFamily: 'Montserrat'),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: RoostColors.textSecondary,
+                          fontFamily: 'Montserrat',
+                        ),
                         children: [
                           const TextSpan(text: 'Already have an account?  '),
-                          TextSpan(text: 'Sign in',
-                              style: TextStyle(color: RoostColors.accent, fontWeight: FontWeight.w700)),
+                          TextSpan(
+                            text: 'Sign in',
+                            style: TextStyle(
+                              color: RoostColors.accent,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -391,12 +596,22 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(PhosphorIcons.shieldCheck(), size: 16, color: RoostColors.textTertiary),
+                      Icon(
+                        PhosphorIcons.shieldCheck(),
+                        size: 16,
+                        color: RoostColors.textTertiary,
+                      ),
                       const SizedBox(width: 6),
                       Flexible(
-                        child: Text('Secured for FUTO students',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 12, color: RoostColors.textTertiary, fontWeight: FontWeight.w500)),
+                        child: Text(
+                          'Secured for FUTO students',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: RoostColors.textTertiary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -410,9 +625,16 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
   }
 
   Widget _label(String t) => Padding(
-        padding: const EdgeInsets.only(bottom: RoostSpacing.sm, left: 2),
-        child: Text(t, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: RoostColors.textSecondary)),
-      );
+    padding: const EdgeInsets.only(bottom: RoostSpacing.sm, left: 2),
+    child: Text(
+      t,
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: RoostColors.textSecondary,
+      ),
+    ),
+  );
 }
 
 class _Wordmark extends StatelessWidget {
@@ -420,10 +642,21 @@ class _Wordmark extends StatelessWidget {
   Widget build(BuildContext context) {
     return RichText(
       text: TextSpan(
-        style: const TextStyle(fontFamily: 'Montserrat', fontSize: 48, fontWeight: FontWeight.w800, letterSpacing: -1.5),
+        style: const TextStyle(
+          fontFamily: 'Montserrat',
+          fontSize: 48,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -1.5,
+        ),
         children: [
-          TextSpan(text: 'Roost', style: TextStyle(color: RoostColors.textPrimary)),
-          TextSpan(text: '.', style: TextStyle(color: RoostColors.accent)),
+          TextSpan(
+            text: 'Roost',
+            style: TextStyle(color: RoostColors.textPrimary),
+          ),
+          TextSpan(
+            text: '.',
+            style: TextStyle(color: RoostColors.accent),
+          ),
         ],
       ),
     );

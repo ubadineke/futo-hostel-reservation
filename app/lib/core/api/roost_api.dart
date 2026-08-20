@@ -77,6 +77,13 @@ class RoostApi {
     return _decode(res);
   }
 
+  Future<dynamic> _patch(String path, Object body) async {
+    final res = await _client
+        .patch(_uri(path), headers: _headers, body: jsonEncode(body))
+        .timeout(_timeout);
+    return _decode(res);
+  }
+
   dynamic _decode(http.Response res) {
     final ok = res.statusCode >= 200 && res.statusCode < 300;
     dynamic body;
@@ -114,9 +121,22 @@ class RoostApi {
         j['token'] as String, Student.fromJson(j['student'] as Map<String, dynamic>));
   }
 
-  Future<AuthResult> register(String identifier, String password) async {
-    final j = await _post('/auth/register',
-        {'identifier': identifier, 'password': password}) as Map<String, dynamic>;
+  Future<AuthResult> register({
+    required String name,
+    required String regNo,
+    required String email,
+    required String dept,
+    required String level,
+    required String password,
+  }) async {
+    final j = await _post('/auth/register', {
+      'name': name,
+      'regNo': regNo,
+      'email': email,
+      'dept': dept,
+      'level': level,
+      'password': password,
+    }) as Map<String, dynamic>;
     return AuthResult(
         j['token'] as String, Student.fromJson(j['student'] as Map<String, dynamic>));
   }
@@ -124,6 +144,22 @@ class RoostApi {
   Future<Student> me() async {
     final j = await _get('/auth/me') as Map<String, dynamic>;
     // Spec returns StudentDto directly; tolerate a { student } wrapper too.
+    final s = (j['student'] is Map ? j['student'] : j) as Map<String, dynamic>;
+    return Student.fromJson(s);
+  }
+
+  Future<Student> updateProfile({
+    String? name,
+    String? email,
+    String? dept,
+    String? level,
+  }) async {
+    final body = <String, String>{};
+    if (name != null) body['name'] = name;
+    if (email != null) body['email'] = email;
+    if (dept != null) body['dept'] = dept;
+    if (level != null) body['level'] = level;
+    final j = await _patch('/auth/me', body) as Map<String, dynamic>;
     final s = (j['student'] is Map ? j['student'] : j) as Map<String, dynamic>;
     return Student.fromJson(s);
   }

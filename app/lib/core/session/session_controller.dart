@@ -21,6 +21,11 @@ class SessionController extends Notifier<Student?> {
     required String identifier,
     required String password,
     bool register = false,
+    String? name,
+    String? regNo,
+    String? email,
+    String? dept,
+    String? level,
   }) async {
     if (AppConfig.useDemoData) {
       state = Student.demo();
@@ -29,7 +34,14 @@ class SessionController extends Notifier<Student?> {
     try {
       final api = ref.read(roostApiProvider);
       final auth = register
-          ? await api.register(identifier, password)
+          ? await api.register(
+              name: name!,
+              regNo: regNo!,
+              email: email!,
+              dept: dept!,
+              level: level!,
+              password: password,
+            )
           : await api.login(identifier, password);
       api.setToken(auth.token);
       try {
@@ -96,6 +108,35 @@ class SessionController extends Notifier<Student?> {
       await ref.read(tokenStoreProvider).clear();
     }
     state = null;
+  }
+
+  /// Updates the signed-in student's editable profile fields and immediately
+  /// refreshes the profile tab from the server response.
+  Future<String?> updateProfile({
+    String? name,
+    String? email,
+    String? dept,
+    String? level,
+  }) async {
+    if (AppConfig.useDemoData) {
+      return 'Profile editing needs the live API.';
+    }
+    try {
+      final student = await ref.read(roostApiProvider).updateProfile(
+            name: name,
+            email: email,
+            dept: dept,
+            level: level,
+          );
+      state = student;
+      return null;
+    } on ApiException catch (e) {
+      _log('Profile update API error: ${e.statusCode} ${e.code} — ${e.message}');
+      return e.message;
+    } catch (e) {
+      _log('Profile update connection error: $e');
+      return 'Could not save your profile. Check your connection and try again.';
+    }
   }
 
   /// Fill [HostelData] + [reservationsProvider] from the backend. Every request

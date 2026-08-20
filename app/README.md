@@ -36,6 +36,30 @@ build/app/outputs/flutter-apk/app-release.apk
 The current release configuration is debug-key signed for testing. Create and
 configure a private Android signing key before Play Store distribution.
 
+## Run both apps on a physical iPhone
+
+Connect and unlock the iPhone, trust the Mac, and enable **Developer Mode** in
+**Settings → Privacy & Security → Developer Mode**. Then find its device ID:
+
+```bash
+flutter devices
+```
+
+Run the student app:
+
+```bash
+flutter run -d <iphone-device-id> -t lib/main.dart
+```
+
+Run the admin app in another terminal:
+
+```bash
+flutter run -d <iphone-device-id> --flavor admin -t lib/main_admin.dart
+```
+
+The admin flavor uses a separate iOS bundle ID, so it installs as a second app
+rather than replacing the student app.
+
 ## Optional admin app
 
 The administrative mobile app has a separate entry point and is optional:
@@ -45,4 +69,5 @@ flutter run -t lib/main_admin.dart
 flutter build apk --release -t lib/main_admin.dart
 ```
 
-It requires a backend admin account. The static web dashboard is in `../admin/`.
+For physical iOS development, use the `--flavor admin` command above. It
+requires a backend admin account. The static web dashboard is in `../admin/`.

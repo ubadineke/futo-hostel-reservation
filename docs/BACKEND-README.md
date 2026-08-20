@@ -160,7 +160,8 @@ The first screen (route `/`). Three actions:
      `^[a-z]+\.[a-z]+\.\d{11}@futo\.edu\.ng$` (case-insensitive).
    - `password` = ≥ 8 chars, at least **one letter and one digit**.
    - → `POST /auth/login` → `{ token, student }`. App stores the token, navigates to home.
-2. **Create account** (bottom sheet) — identifier + password + confirm password.
+2. **Create account** — full name, 11-digit registration number, matching FUTO school
+   email, department, level, password, and confirm password. Every field is required.
    - → `POST /auth/register` → `{ token, student }`.
 3. **Face ID / fingerprint** — **device-side only.** Biometric unlocks the locally
    stored token; the app then calls `GET /auth/me` to restore the session. **No
@@ -277,9 +278,10 @@ admin JWT.
 ### Auth
 | Method | Path | Body → Response | Auth |
 |---|---|---|---|
-| `POST` | `/auth/register` | `{ identifier, password }` → `{ token, student }` | — |
+| `POST` | `/auth/register` | `{ name, regNo, email, dept, level, password }` → `{ token, student }` | — |
 | `POST` | `/auth/login` | `{ identifier, password }` → `{ token, student }` | — |
 | `GET`  | `/auth/me` | → `{ student }` (restores session after biometric unlock) | student |
+| `PATCH` | `/auth/me` | `{ name?, email?, dept?, level? }` → updated student | student |
 | `POST` | `/auth/logout` | → `204` (optional token invalidation) | student |
 
 ### Hostels
@@ -390,7 +392,7 @@ Cover colours are shown as the source hex (store as the ARGB int).
 
 | id | name | code | funder | gender | price | roomSize | lat | lng | coverA / coverB |
 |---|---|---|---|---|---|---|---|---|---|
-| A | Hostel A | A | School | male | 42000 | 8–10 per room | 5.3869 | 7.0341 | 0xFF1E3A8A / 0xFF2563EB |
+| A | Hostel A | A | School | male | 100 | 8–10 per room | 5.3869 | 7.0341 | 0xFF1E3A8A / 0xFF2563EB |
 | B | Hostel B | B | School | male | 42000 | 8–10 per room | 5.3872 | 7.0347 | 0xFF312E81 / 0xFF4F46E5 |
 | C | Hostel C | C | School | female | 45000 | 6–8 per room | 5.3858 | 7.0359 | 0xFF0F766E / 0xFF0EA5A4 |
 | D | Hostel D | D | School | female | 45000 | 6–8 per room | 5.3855 | 7.0364 | 0xFF155E75 / 0xFF0891B2 |
@@ -424,7 +426,8 @@ status `cancelled`, date `Sep 14, 2025`.
 ## 9. Validation & status codes
 
 ```
-Identifier : ^\d{11}$  OR  ^[a-z]+\.[a-z]+\.\d{11}@futo\.edu\.ng$   (case-insensitive)
+Registration number : ^\d{11}$
+School email        : ^[a-z]+\.[a-z]+\.\d{11}@futo\.edu\.ng$   (case-insensitive; embedded reg-no must match)
 Password   : length ≥ 8 AND contains ≥1 letter AND ≥1 digit
 Confirm    : (register only) must equal password
 ```

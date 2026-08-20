@@ -333,7 +333,7 @@ class HostelData {
       code: 'A',
       funder: 'School',
       gender: Gender.male,
-      price: 42000,
+      price: 100,
       capacity: 8,
       roomSize: '8 per room',
       lat: 5.3869,

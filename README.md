@@ -80,6 +80,26 @@ flutter build apk --release -t lib/main_admin.dart
 The repository also contains a lightweight web admin dashboard in `admin/`.
 Both admin clients require an admin account on the backend.
 
+### 🍎 Run both apps on a physical iPhone
+
+Connect and unlock the iPhone, trust the Mac, and enable **Developer Mode** in
+**Settings → Privacy & Security → Developer Mode**. With the device connected:
+
+```bash
+cd app
+flutter devices                         # copy the iPhone device ID
+
+# Student app — opens as “Futo Hostel”
+flutter run -d <iphone-device-id> -t lib/main.dart
+
+# Admin app — opens separately as “Hostel Admin”
+flutter run -d <iphone-device-id> --flavor admin -t lib/main_admin.dart
+```
+
+Run the commands in separate terminals if you want both debug sessions active.
+The `admin` flavor selects the iOS `Debug-admin` configuration, which has a
+different bundle ID from the student app, so both remain installed side by side.
+
 ### 🌐 Landing page and web admin (no build step)
 Open `landing/index.html` or `admin/index.html` directly, **or** serve the folder:
 ```bash
